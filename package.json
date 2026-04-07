@@ -6,7 +6,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "dev": "sanity dev",
-    "start": "sanity start",
+    "start": "nvm use 22 &&sanity start",
     "build": "sanity build",
     "deploy": "sanity deploy",
     "deploy-graphql": "sanity graphql deploy"
@@ -15,10 +15,10 @@
     "sanity"
   ],
   "dependencies": {
-    "@sanity/vision": "^5.11.0",
+    "@sanity/vision": "^5.20.0",
     "react": "^19.1",
     "react-dom": "^19.1",
-    "sanity": "^5.11.0",
+    "sanity": "^5.20.0",
     "styled-components": "^6.1.18"
   },
   "devDependencies": {
