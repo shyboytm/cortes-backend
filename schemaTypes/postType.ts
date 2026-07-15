@@ -32,7 +32,7 @@ export const postType = defineType({
       type: 'number',
       initialValue: 0,
       readOnly: true,
-      description: 'Incremented by the like button on the site — not meant to be edited by hand.',
+      description: 'Incremented by the like button on the site, not meant to be edited by hand.',
     }),
     defineField({
       name: 'body',
@@ -59,7 +59,7 @@ export const postType = defineType({
               name: 'size',
               title: 'Layout',
               type: 'string',
-              description: 'How this image sits in the post — inset (matches the text column), half '
+              description: 'How this image sits in the post: inset (matches the text column), half '
                 + '(pairs side-by-side with the next half-width image), wide (breaks past the text '
                 + 'column), or full (edge-to-edge bleed).',
               options: {

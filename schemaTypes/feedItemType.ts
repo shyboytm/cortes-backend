@@ -10,7 +10,7 @@ export const feedItemType = defineType({
       title: 'Image',
       type: 'image',
       description:
-        'Shows up on the Feed grid. Any size/shape works — the grid lays itself out around whatever you upload. Leave empty if you\'re uploading a video below instead.',
+        'Shows up on the Feed grid. Any size/shape works, the grid lays itself out around whatever you upload. Leave empty if you\'re uploading a video below instead.',
       options: {hotspot: true},
       fields: [
         defineField({
@@ -32,7 +32,7 @@ export const feedItemType = defineType({
       title: 'Video',
       type: 'file',
       description:
-        'Alternative to Image above — upload a short video instead. Plays silently on a loop in the Feed grid. Leave empty if this entry is an image.',
+        'Alternative to Image above: upload a short video instead. Plays silently on a loop in the Feed grid. Leave empty if this entry is an image.',
       options: {accept: 'video/*'},
     }),
     defineField({
@@ -46,13 +46,13 @@ export const feedItemType = defineType({
       title: 'Link',
       type: 'url',
       description:
-        'Optional. If set, the whole item becomes clickable and opens this link in a new tab — it also gets the same hover arrow used on Work project cards.',
+        'Optional. If set, the whole item becomes clickable and opens this link in a new tab, and also gets the same hover arrow used on Work project cards.',
       validation: (rule) => rule.uri({scheme: ['http', 'https']}),
     }),
     defineField({
       name: 'order',
       type: 'number',
-      description: 'Controls Feed grid ordering — lower numbers show first. Leave blank to sort newest first.',
+      description: 'Controls Feed grid ordering: lower numbers show first. Leave blank to sort newest first.',
     }),
     defineField({
       name: 'likes',
@@ -60,7 +60,7 @@ export const feedItemType = defineType({
       type: 'number',
       initialValue: 0,
       readOnly: true,
-      description: 'Incremented by the like button on the site — not meant to be edited by hand.',
+      description: 'Incremented by the like button on the site, not meant to be edited by hand.',
     }),
   ],
   preview: {

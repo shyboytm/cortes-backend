@@ -49,7 +49,7 @@ export const workType = defineType({
     defineField({
       name: 'order',
       type: 'number',
-      description: 'Controls homepage ordering — lower numbers show first. Leave blank to sort newest first.',
+      description: 'Controls homepage ordering: lower numbers show first. Leave blank to sort newest first.',
     }),
     defineField({
       name: 'mainImage',
@@ -73,7 +73,7 @@ export const workType = defineType({
       title: 'Hover Image',
       type: 'image',
       description:
-        'Optional. If set, the homepage thumbnail swaps to this image when hovered — also cropped to the same consistent 4:3 box. Leave empty to keep the main image on hover too.',
+        'Optional. If set, the homepage thumbnail swaps to this image when hovered, also cropped to the same consistent 4:3 box. Leave empty to keep the main image on hover too.',
       options: {hotspot: true},
       fields: [
         defineField({
@@ -89,7 +89,7 @@ export const workType = defineType({
       title: 'Photos (legacy)',
       type: 'array',
       description:
-        'Not currently shown anywhere on the site — the homepage thumbnail now uses Main Image / Hover Image instead. Kept around in case these get used for a project gallery later.',
+        'Not currently shown anywhere on the site. The homepage thumbnail now uses Main Image / Hover Image instead. Kept around in case these get used for a project gallery later.',
       of: [
         {
           type: 'image',
@@ -110,7 +110,7 @@ export const workType = defineType({
       title: 'Case Study',
       type: 'array',
       description:
-        'Optional. Write the full case study for this project here — text and images can be mixed freely. If this has any content, this project\'s homepage thumbnail becomes clickable and links to its case study page. Leave empty to keep it as a static preview.',
+        'Optional. Write the full case study for this project here, text and images can be mixed freely. If this has any content, this project\'s homepage thumbnail becomes clickable and links to its case study page. Leave empty to keep it as a static preview.',
       of: [
         {type: 'block'},
         {

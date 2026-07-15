@@ -36,7 +36,7 @@ export const recommendationType = defineType({
       name: 'platform',
       title: 'Platform',
       type: 'string',
-      description: 'Which platform this app is for — shown as a small tag next to the name. Only used for Apps.',
+      description: 'Which platform this app is for, shown as a small tag next to the name. Only used for Apps.',
       options: {
         list: [
           {title: 'iOS', value: 'ios'},
@@ -54,7 +54,7 @@ export const recommendationType = defineType({
       name: 'description',
       type: 'text',
       rows: 3,
-      description: 'Why you recommend it — shown under the name on the Recs page.',
+      description: 'Why you recommend it, shown under the name on the Recs page.',
       validation: (rule) => rule.required(),
     }),
     defineField({
@@ -68,7 +68,7 @@ export const recommendationType = defineType({
       name: 'image',
       title: 'Image',
       type: 'image',
-      description: 'Optional — a logo, icon, or cover image shown alongside this recommendation.',
+      description: 'Optional. A logo, icon, or cover image shown alongside this recommendation.',
       options: {hotspot: true},
       fields: [
         defineField({
@@ -82,7 +82,7 @@ export const recommendationType = defineType({
     defineField({
       name: 'order',
       type: 'number',
-      description: 'Controls ordering within its category — lower numbers show first. Leave blank to sort newest first.',
+      description: 'Controls ordering within its category: lower numbers show first. Leave blank to sort newest first.',
     }),
     defineField({
       name: 'likes',
@@ -90,7 +90,7 @@ export const recommendationType = defineType({
       type: 'number',
       initialValue: 0,
       readOnly: true,
-      description: 'Incremented by the like button on the site — not meant to be edited by hand.',
+      description: 'Incremented by the like button on the site, not meant to be edited by hand.',
     }),
   ],
   preview: {

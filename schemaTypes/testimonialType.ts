@@ -22,13 +22,13 @@ export const testimonialType = defineType({
       name: 'role',
       title: 'Role & Company',
       type: 'string',
-      description: 'e.g. "Sr Designer @ Community" — shown after the name.',
+      description: 'e.g. "Sr Designer @ Community", shown after the name.',
     }),
     defineField({
       name: 'order',
       type: 'number',
       description:
-        'Controls ordering in the "What Others Say" section — lower numbers show first. Leave blank to sort newest first.',
+        'Controls ordering in the "What Others Say" section: lower numbers show first. Leave blank to sort newest first.',
     }),
   ],
   preview: {

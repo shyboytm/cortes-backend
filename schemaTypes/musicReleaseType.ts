@@ -9,7 +9,7 @@ export const musicReleaseType = defineType({
       name: 'artwork',
       title: 'Artwork',
       type: 'image',
-      description: 'Cover art for this release — shown in the releases grid on the Music page.',
+      description: 'Cover art for this release, shown in the releases grid on the Music page.',
       options: {hotspot: true},
       fields: [
         defineField({
@@ -75,14 +75,22 @@ export const musicReleaseType = defineType({
       name: 'link',
       title: 'Listen Link',
       type: 'url',
-      description: 'Where "listen" points to — Bandcamp, Spotify, or wherever this release lives.',
+      description: 'Where "listen" points to: Bandcamp, Spotify, or wherever this release lives.',
       validation: (rule) => rule.uri({scheme: ['http', 'https']}).required(),
     }),
     defineField({
       name: 'order',
       type: 'number',
       description:
-        'Optional — use to fine-tune ordering among releases from the same year. Lower numbers show first. Leave blank to sort by year, newest first.',
+        'Optional. Use to fine-tune ordering among releases from the same year. Lower numbers show first. Leave blank to sort by year, newest first.',
+    }),
+    defineField({
+      name: 'likes',
+      title: 'Likes',
+      type: 'number',
+      initialValue: 0,
+      readOnly: true,
+      description: 'Incremented by the like button on the site, not meant to be edited by hand.',
     }),
   ],
   preview: {

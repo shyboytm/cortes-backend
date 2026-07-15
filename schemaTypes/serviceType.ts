@@ -15,14 +15,14 @@ export const serviceType = defineType({
       name: 'description',
       type: 'text',
       rows: 3,
-      description: 'A sentence or two on what this service covers — shown under the title.',
+      description: 'A sentence or two on what this service covers, shown under the title.',
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: 'order',
       type: 'number',
       description:
-        'Controls ordering in the Services section on the Info page — lower numbers show first. Leave blank to sort newest first.',
+        'Controls ordering in the Services section on the Info page: lower numbers show first. Leave blank to sort newest first.',
     }),
   ],
   preview: {
