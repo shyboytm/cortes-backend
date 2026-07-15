@@ -27,6 +27,14 @@ export const postType = defineType({
       type: 'image',
     }),
     defineField({
+      name: 'likes',
+      title: 'Likes',
+      type: 'number',
+      initialValue: 0,
+      readOnly: true,
+      description: 'Incremented by the like button on the site — not meant to be edited by hand.',
+    }),
+    defineField({
       name: 'body',
       type: 'array',
       of: [
