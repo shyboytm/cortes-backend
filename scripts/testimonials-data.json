@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Jimmy",
+    "role": "Sr Designer @ Community",
+    "order": 1,
+    "quote": "Dennis was one of the most humble and pleasant designers I worked with. His work speaks for itself. He's a systems thinker, capable of understanding the problem with a holistic view and arriving at a range of creative solutions for the best product experience. Excellent speaker, great communicator, and above all, a compassionate human with a heart of gold. 10/10 would work together again in a heartbeat."
+  },
+  {
+    "name": "Matt",
+    "role": "Sr Engineer @ Mothership",
+    "order": 2,
+    "quote": "Working with Dennis on the Carrier app has been awesome. Specifically, he's incredibly available and responsive to unexpected issues. He also asks great clarifying questions to get at the heart of the matter.\n\nDennis gets to solutions/judgments very quickly, even on the crunchiest of topics. He's incredibly flexible and quickly embraces the best idea that emerges with fast follow-up actions; and he's willing to say \"no\" to bad ideas."
+  },
+  {
+    "name": "Risa",
+    "role": "Sr Designer @ Mothership",
+    "order": 3,
+    "quote": "Dennis is an incredible designer, one of the best I have ever worked with in my whole career. He's on top of the design system, hyper-organized, and can push visual designs to world-class standard.\n\nDennis is open to feedback and never takes it personally which is one of the most important qualities as a designer. He's great at facilitating and leading conversations in meetings especially when topics become technical.\n\nDennis checks in with his team members often and tries to help out if we are blocked by something. He brings his true self to the workspace which helps us open up to him too."
+  },
+  {
+    "name": "John",
+    "role": "Sr Engineer @ Mothership",
+    "order": 4,
+    "quote": "Dennis was an absolute pleasure to work with at Mothership. As an engineer developing the company's web-based dashboard, I quickly discovered that - in addition to being an excellent designer - Dennis is a great communicator who understands the technical challenges that his coworkers deal with and takes them in stride. That, I think, is part of his greatest strength: a breadth of competence that extends past his core responsibilities and into all of the miscellaneous odds and ends that come up when you're wearing many hats at a startup.\n\nI feel it's also worth mentioning that he makes the chillest music and has a highly-refined palette for coffee. Ask him about both if you get the chance."
+  },
+  {
+    "name": "Karlee",
+    "role": "Sr Designer @ Mothership",
+    "order": 5,
+    "quote": "I worked with Dennis for 6 months under his leadership. It was the most outstanding mentorship I've received throughout my professional career. Dennis is a natural leader with incredible design experience. He is always on top of the trends, but beyond that he is strategic, collaborative, imaginative, and focused. He has a special talent for architecting incredibly complex design systems that are highly scalable and easy to use.\n\nOn top of exceeding my every expectation at work, he is one of the kindest and most empathetic human beings I've ever met. It was an absolute honor to work with Dennis and to grow so much as a designer during our time together."
+  },
+  {
+    "name": "Sam",
+    "role": "Co-Founder @ Fanimal",
+    "order": 6,
+    "quote": "We worked with Dennis on a small but important project for the Fanimal website. It was immediately clear that he is a tremendously talented designer, and he was able to deliver far above expectations within the budget & time allotted. We are excited to work with Dennis again as soon possible!"
+  }
+]

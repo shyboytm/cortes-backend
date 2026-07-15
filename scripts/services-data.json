@@ -1,0 +1,22 @@
+[
+  {
+    "title": "Design Consulting",
+    "order": 1,
+    "description": "Hands-on product design help for early-stage teams — 0→1 product strategy, UX/UI, and design systems work."
+  },
+  {
+    "title": "Custom Music & Sound Design",
+    "order": 2,
+    "description": "Original music and sound design for film, games, podcasts, and apps, produced under the Cordio and Horizon Radar aliases."
+  },
+  {
+    "title": "Product Validation & Process",
+    "order": 3,
+    "description": "Helping teams validate product decisions and build the design and research process that gets them unstuck."
+  },
+  {
+    "title": "Sponsored Partnerships",
+    "order": 4,
+    "description": "Brand and product partnerships across design, music, and content — reach out to talk specifics."
+  }
+]

@@ -9,16 +9,21 @@
     "start": "nvm use 22 &&sanity start",
     "build": "sanity build",
     "deploy": "sanity deploy",
-    "deploy-graphql": "sanity graphql deploy"
+    "deploy-graphql": "sanity graphql deploy",
+    "import:recs": "node scripts/import-recs.mjs",
+    "import:music": "node scripts/import-music-releases.mjs",
+    "import:testimonials": "node scripts/import-testimonials.mjs",
+    "import:services": "node scripts/import-services.mjs"
   },
   "keywords": [
     "sanity"
   ],
   "dependencies": {
-    "@sanity/vision": "^5.20.0",
+    "@sanity/client": "^6.24.1",
+    "@sanity/vision": "^5.31.1",
     "react": "^19.1",
     "react-dom": "^19.1",
-    "sanity": "^5.20.0",
+    "sanity": "^5.31.1",
     "styled-components": "^6.1.18"
   },
   "devDependencies": {
