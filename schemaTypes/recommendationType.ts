@@ -26,6 +26,7 @@ export const recommendationType = defineType({
           {title: 'App', value: 'app'},
           {title: 'Music', value: 'music'},
           {title: 'Gear', value: 'gear'},
+          {title: 'Website', value: 'website'},
         ],
         layout: 'radio',
       },
@@ -69,6 +70,22 @@ export const recommendationType = defineType({
       title: 'Image',
       type: 'image',
       description: 'Optional. A logo, icon, or cover image shown alongside this recommendation.',
+      options: {hotspot: true},
+      fields: [
+        defineField({
+          name: 'alt',
+          title: 'Alt text',
+          type: 'string',
+          description: 'Describe the image for accessibility and SEO.',
+        }),
+      ],
+    }),
+    defineField({
+      name: 'hoverPreview',
+      title: 'Hover Preview',
+      type: 'image',
+      description:
+        'Optional. Shown in the little browser-window preview card that appears when hovering this recommendation on the Recs page. Leave empty to skip the preview for this item.',
       options: {hotspot: true},
       fields: [
         defineField({

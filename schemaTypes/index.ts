@@ -1,23 +1,29 @@
-import {postType} from './postType'
-import {pageType} from './pageType'
-import {workType} from './workType'
-import {feedItemType} from './feedItemType'
-import {recommendationType} from './recommendationType'
-import {musicReleaseType} from './musicReleaseType'
-import {testimonialType} from './testimonialType'
-import {serviceType} from './serviceType'
 import {clientType} from './clientType'
+import {feedItemType} from './feedItemType'
+import {musicReleaseType} from './musicReleaseType'
+import {pageType} from './pageType'
+import {postType} from './postType'
 import {pressMentionType} from './pressMentionType'
+import {productType} from './productType'
+import {recommendationType} from './recommendationType'
+import {serviceType} from './serviceType'
+import {testimonialType} from './testimonialType'
+import {workType} from './workType'
 
+// Kept in alphabetical order by document title (Client, Feed, Music
+// Release, Page, Post, Press Mention, Recommendation, Service, Testimonial,
+// Work) — the Studio's default document list follows this array's order,
+// so this is what keeps the dashboard's type list sorted A-Z.
 export const schemaTypes = [
-  postType,
-  pageType,
-  workType,
-  feedItemType,
-  recommendationType,
-  musicReleaseType,
-  testimonialType,
-  serviceType,
   clientType,
+  feedItemType,
+  musicReleaseType,
+  pageType,
+  postType,
   pressMentionType,
+  productType,
+  recommendationType,
+  serviceType,
+  testimonialType,
+  workType,
 ]

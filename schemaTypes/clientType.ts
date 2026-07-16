@@ -39,6 +39,14 @@ export const clientType = defineType({
       description:
         'Controls ordering in the Clients section: lower numbers show first. Leave blank to sort newest first.',
     }),
+    defineField({
+      name: 'displaySize',
+      title: 'Display Size Adjustment',
+      type: 'number',
+      description:
+        'Optional. Logos are all shown at the same height, but some (e.g. dense wordmarks like "Uber") still end up looking visually bigger than others. Nudge this down (e.g. 0.8) to shrink this logo relative to the rest, or up (e.g. 1.2) to grow it. Leave blank to use the default size of 1.',
+      initialValue: 1,
+    }),
   ],
   preview: {
     select: {
