@@ -59,6 +59,14 @@ export const productType = defineType({
       type: 'number',
       description: 'Controls ordering on the Shop page: lower numbers show first. Leave blank to sort newest first.',
     }),
+    defineField({
+      name: 'likes',
+      title: 'Likes',
+      type: 'number',
+      initialValue: 0,
+      readOnly: true,
+      description: 'Incremented by the like button on the site, not meant to be edited by hand.',
+    }),
   ],
   preview: {
     select: {
