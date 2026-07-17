@@ -32,6 +32,9 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
   const client = useClient({apiVersion: '2024-01-01'})
   const {patch} = useDocumentOperation(id, type)
   const [isRunning, setIsRunning] = useState(false)
+  // Shown in a dialog once the action finishes, since a silent success/no-op
+  // is otherwise indistinguishable from the button not doing anything.
+  const [resultMessage, setResultMessage] = useState<string | null>(null)
 
   if (type !== 'photo') return null
 
@@ -66,17 +69,38 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
           if (parsed) patchSet.dateTaken = parsed
         }
 
-        // setIfMissing only fills fields that are currently empty, so this
-        // never clobbers a value the photographer already typed in by hand.
-        if (Object.keys(patchSet).length > 0) {
+        const filledFields = Object.keys(patchSet)
+        if (filledFields.length > 0) {
+          // setIfMissing only fills fields that are currently empty, so this
+          // never clobbers a value the photographer already typed in by hand.
           patch.execute([{setIfMissing: patchSet}])
+          setResultMessage(`Filled in: ${filledFields.join(', ')}.`)
+        } else {
+          setResultMessage(
+            "No camera/lens/date data was found in this image's metadata. If you just uploaded it, Sanity may still be processing it, wait a few seconds and try again. Some images (screenshots, re-saved exports, messaging-app downloads) never carry this data to begin with."
+          )
         }
       } catch (error) {
-        console.error('Failed to read EXIF metadata:', error)
+        setResultMessage(
+          `Something went wrong reading this image's metadata: ${error instanceof Error ? error.message : String(error)}`
+        )
       } finally {
         setIsRunning(false)
-        onComplete()
       }
     },
+    // onComplete is deferred to the dialog closing (rather than called
+    // right after onHandle) so the result message stays on screen until the
+    // photographer has actually seen it.
+    dialog: resultMessage
+      ? {
+          type: 'dialog',
+          onClose: () => {
+            setResultMessage(null)
+            onComplete()
+          },
+          header: 'Autofill from photo metadata',
+          content: resultMessage,
+        }
+      : undefined,
   }
 }
