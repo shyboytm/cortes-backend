@@ -55,13 +55,19 @@ export const photoType = defineType({
       description: 'Optional. When the photo was actually shot. Shown in the lightbox.',
       // Just controls how the date picker displays/enters the date in the
       // Studio UI; the stored value is still a plain ISO date string.
-      options: {dateFormat: 'MM DD YYYY'},
+      options: {dateFormat: 'MM/DD/YYYY'},
     }),
     defineField({
       name: 'settings',
       title: 'Settings',
       type: 'string',
       description: 'Optional. Shutter speed, aperture, and ISO used, e.g. "1/200s · f/2.8 · ISO 200". Shown in the lightbox.',
+    }),
+    defineField({
+      name: 'location',
+      title: 'Location',
+      type: 'string',
+      description: 'Optional. Where the photo was taken, e.g. "Nashville, TN". Shown in the lightbox.',
     }),
     defineField({
       name: 'order',

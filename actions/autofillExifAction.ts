@@ -31,6 +31,19 @@ function formatShutterSpeed(exposureTime: number): string | null {
   return `1/${Math.round(1 / exposureTime)}s`
 }
 
+// Camera makes usually come back from EXIF shouting in all-caps (e.g.
+// "RICOH IMAGING COMPANY, LTD."); this reads better title-cased ("Ricoh
+// Imaging Company, Ltd."). Only applied to the make, not the model — model
+// strings mix real words with alphanumeric codes (e.g. "GR IIIx HDF") that
+// title-casing would mangle.
+function toTitleCase(value: string): string {
+  return value
+    .toLowerCase()
+    .split(' ')
+    .map((word) => (word ? word[0].toUpperCase() + word.slice(1) : word))
+    .join(' ')
+}
+
 // Custom Studio action on the Photo document type: reads the uploaded
 // image's camera/lens/date/settings metadata — extracted natively by
 // Sanity at upload time, per the `options.metadata` list on the image
@@ -80,7 +93,7 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
         )
 
         const patchSet: Record<string, string> = {}
-        const make = asset?.image?.Make?.trim() ?? ''
+        const make = asset?.image?.Make?.trim() ? toTitleCase(asset.image.Make.trim()) : ''
         const model = asset?.image?.Model?.trim() ?? ''
         const camera = [make, model].filter(Boolean).join(' ')
         if (camera) patchSet.camera = camera
