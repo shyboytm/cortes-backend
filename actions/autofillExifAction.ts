@@ -63,14 +63,12 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
         })
         if (!asset?.url) throw new Error("Could not find this photo's file URL.")
 
-        const tags = await parseExif(asset.url, [
-          'Make',
-          'Model',
-          'LensModel',
-          'LensMake',
-          'DateTimeOriginal',
-          'CreateDate',
-        ])
+        // No pick filter here (unlike an earlier version of this action):
+        // parsing everything first, rather than only the handful of fields
+        // we ultimately want, makes it possible to tell "the file genuinely
+        // has no metadata" apart from "we're reading the wrong tag names."
+        const tags = await parseExif(asset.url)
+        const tagEntries = tags ? Object.entries(tags) : []
 
         const patchSet: Record<string, string> = {}
         const make = typeof tags?.Make === 'string' ? tags.Make.trim() : ''
@@ -78,10 +76,10 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
         const camera = [make, model].filter(Boolean).join(' ')
         if (camera) patchSet.camera = camera
 
-        const lens = tags?.LensModel
+        const lens = tags?.LensModel ?? tags?.LensInfo ?? tags?.Lens
         if (typeof lens === 'string' && lens.trim()) patchSet.lens = lens.trim()
 
-        const dateTaken = formatExifDate(tags?.DateTimeOriginal ?? tags?.CreateDate)
+        const dateTaken = formatExifDate(tags?.DateTimeOriginal ?? tags?.CreateDate ?? tags?.ModifyDate)
         if (dateTaken) patchSet.dateTaken = dateTaken
 
         const filledFields = Object.keys(patchSet)
@@ -90,9 +88,16 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
           // never clobbers a value the photographer already typed in by hand.
           patch.execute([{setIfMissing: patchSet}])
           setResultMessage(`Filled in: ${filledFields.join(', ')}.`)
+        } else if (tagEntries.length > 0) {
+          // Metadata was found, just not under the tag names we look for.
+          // Surfacing it raw makes it possible to see what to add support
+          // for, instead of guessing blind.
+          setResultMessage(
+            `Found ${tagEntries.length} metadata field(s) on this file, but none matched camera/lens/date. Raw tags: ${JSON.stringify(tags)}`
+          )
         } else {
           setResultMessage(
-            "No camera/lens/date data was found in this image's file. Some images (screenshots, re-saved exports, messaging-app downloads) never carry this data to begin with."
+            `No metadata at all was read from this file (URL: ${asset.url}). This usually means the browser couldn't read the file's bytes (a network or CORS issue), rather than the file itself lacking EXIF data.`
           )
         }
       } catch (error) {
