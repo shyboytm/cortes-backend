@@ -1,5 +1,4 @@
 import {useState} from 'react'
-import {parse as parseExif} from 'exifr'
 import {useClient, useDocumentOperation} from 'sanity'
 import type {DocumentActionComponent, DocumentActionProps} from 'sanity'
 
@@ -11,28 +10,21 @@ interface PhotoDraftLike {
   image?: {asset?: PhotoAssetRef}
 }
 
-// Formats a Date (exifr revives EXIF date tags into Date objects by
-// default) or a raw EXIF "YYYY:MM:DD HH:MM:SS" string into the "YYYY-MM-DD"
-// the dateTaken field expects.
-function formatExifDate(value: unknown): string | null {
-  if (value instanceof Date && !Number.isNaN(value.getTime())) {
-    return value.toISOString().slice(0, 10)
-  }
-  if (typeof value === 'string') {
-    const match = value.match(/^(\d{4}):(\d{2}):(\d{2})/)
-    if (match) return `${match[1]}-${match[2]}-${match[3]}`
-  }
-  return null
+interface AssetMetadata {
+  image?: {Make?: string; Model?: string}
+  exif?: {LensModel?: string; LensMake?: string; DateTimeOriginal?: string; DateTimeDigitized?: string}
 }
 
 // Custom Studio action on the Photo document type: reads the uploaded
-// image's EXIF data (camera make/model, lens, and the date it was shot)
-// and fills in the camera/lens/dateTaken fields if they're currently
-// empty, so the photographer doesn't have to type them in by hand. Sanity
-// doesn't extract EXIF into its own asset metadata, so this fetches the
-// original file's URL and parses it directly with the exifr library
-// instead of reading `asset->metadata.exif` (which doesn't exist). Only
-// shows up once an image has actually been uploaded.
+// image's camera/lens/date metadata — extracted natively by Sanity at
+// upload time, per the `options.metadata` list on the image field in
+// photoType.ts — and fills in the camera/lens/dateTaken fields if they're
+// currently empty, so the photographer doesn't have to type them in by
+// hand. Sanity excludes this data by default (it can contain private info
+// like GPS location) and only starts extracting it going forward from
+// when the schema opts in, so photos uploaded before that change need to
+// be re-uploaded to pick it up. Only shows up once an image has actually
+// been uploaded.
 // Named in PascalCase (rather than the file's camelCase export name) since
 // Sanity renders document actions as React components under the hood, and
 // the react-hooks lint rule requires component-shaped names to allow the
@@ -58,60 +50,53 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
     onHandle: async () => {
       setIsRunning(true)
       try {
-        const asset = await client.fetch<{url?: string} | null>(`*[_id == $assetId][0]{url}`, {
-          assetId: assetRef,
-        })
-        if (!asset?.url) throw new Error("Could not find this photo's file URL.")
-
-        // Fetch the file's bytes ourselves rather than handing exifr the bare
-        // URL. When exifr parses a URL directly in the browser, it issues a
-        // Range request (to only download the first chunk it needs) — a
-        // non-simple request that requires a CORS preflight, which
-        // cdn.sanity.io doesn't reliably answer for arbitrary Studio origins.
-        // A plain `fetch` with no custom headers is a "simple" request that
-        // only needs Access-Control-Allow-Origin, which the CDN does send,
-        // so this sidesteps the Range/preflight failure entirely.
-        const response = await fetch(asset.url)
-        if (!response.ok) {
-          throw new Error(`Could not download the photo file (status ${response.status}).`)
-        }
-        const buffer = await response.arrayBuffer()
-
-        // No pick filter here (unlike an earlier version of this action):
-        // parsing everything first, rather than only the handful of fields
-        // we ultimately want, makes it possible to tell "the file genuinely
-        // has no metadata" apart from "we're reading the wrong tag names."
-        const tags = await parseExif(buffer)
-        const tagEntries = tags ? Object.entries(tags) : []
+        // Reads Sanity's own extracted metadata rather than re-downloading
+        // and re-parsing the file: an earlier version of this action fetched
+        // the raw CDN file and parsed it client-side with exifr, but that
+        // came back empty even for files with real EXIF, because Sanity's
+        // asset pipeline doesn't preserve camera/lens/date data in the
+        // stored file unless the schema explicitly asks for it at upload
+        // time (see photoType.ts). Asking for it there and reading it back
+        // here is the supported, reliable path.
+        const asset = await client.fetch<AssetMetadata | null>(
+          `*[_id == $assetId][0]{"image": metadata.image, "exif": metadata.exif}`,
+          {assetId: assetRef}
+        )
 
         const patchSet: Record<string, string> = {}
-        const make = typeof tags?.Make === 'string' ? tags.Make.trim() : ''
-        const model = typeof tags?.Model === 'string' ? tags.Model.trim() : ''
+        const make = asset?.image?.Make?.trim() ?? ''
+        const model = asset?.image?.Model?.trim() ?? ''
         const camera = [make, model].filter(Boolean).join(' ')
         if (camera) patchSet.camera = camera
 
-        const lens = tags?.LensModel ?? tags?.LensInfo ?? tags?.Lens
-        if (typeof lens === 'string' && lens.trim()) patchSet.lens = lens.trim()
+        const lens = asset?.exif?.LensModel?.trim() || asset?.exif?.LensMake?.trim()
+        if (lens) patchSet.lens = lens
 
-        const dateTaken = formatExifDate(tags?.DateTimeOriginal ?? tags?.CreateDate ?? tags?.ModifyDate)
-        if (dateTaken) patchSet.dateTaken = dateTaken
+        // DateTimeOriginal/DateTimeDigitized come back as ISO date strings
+        // (e.g. "2020-03-19T12:25:17.000Z"); dateTaken just wants the date.
+        const rawDate = asset?.exif?.DateTimeOriginal ?? asset?.exif?.DateTimeDigitized
+        if (typeof rawDate === 'string' && rawDate.length >= 10) {
+          patchSet.dateTaken = rawDate.slice(0, 10)
+        }
 
         const filledFields = Object.keys(patchSet)
+        const hasAnyMetadata = Boolean(asset?.image || asset?.exif)
+
         if (filledFields.length > 0) {
           // setIfMissing only fills fields that are currently empty, so this
           // never clobbers a value the photographer already typed in by hand.
           patch.execute([{setIfMissing: patchSet}])
           setResultMessage(`Filled in: ${filledFields.join(', ')}.`)
-        } else if (tagEntries.length > 0) {
-          // Metadata was found, just not under the tag names we look for.
+        } else if (hasAnyMetadata) {
+          // Metadata was found, just not under the fields we look for.
           // Surfacing it raw makes it possible to see what to add support
           // for, instead of guessing blind.
           setResultMessage(
-            `Found ${tagEntries.length} metadata field(s) on this file, but none matched camera/lens/date. Raw tags: ${JSON.stringify(tags)}`
+            `Found metadata on this file, but none matched camera/lens/date. Raw: ${JSON.stringify(asset)}`
           )
         } else {
           setResultMessage(
-            `No metadata at all was read from this file (downloaded ${buffer.byteLength} bytes from ${asset.url}). The file's bytes were read successfully, so this means the file itself has no EXIF data — some images (screenshots, re-saved exports, messaging-app downloads) never carry it.`
+            "No camera/lens/date data was found for this photo. Either the file itself never carried it (screenshots, re-saved exports, and messaging-app downloads usually don't), or it was uploaded before camera/lens metadata extraction was turned on for this schema, in which case re-uploading the image will pick it up. Metadata is also generated asynchronously right after upload, so if you just uploaded this photo, wait a few seconds and try again."
           )
         }
       } catch (error) {

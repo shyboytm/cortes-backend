@@ -10,7 +10,16 @@ export const photoType = defineType({
       title: 'Image',
       type: 'image',
       description: 'Shows up on the Photos page grid and in the lightbox. Any orientation works.',
-      options: {hotspot: true},
+      options: {
+        hotspot: true,
+        // 'exif' and 'image' (camera/lens/date, aperture, etc.) are excluded
+        // by default since they can contain private info like GPS location —
+        // opting in here so the autofill action below has data to read.
+        // Sanity only extracts this at upload time, so it only applies to
+        // photos uploaded after this change; anything uploaded earlier needs
+        // to be re-uploaded to pick it up.
+        metadata: ['blurhash', 'lqip', 'palette', 'exif', 'image'],
+      },
       fields: [
         defineField({
           name: 'alt',
