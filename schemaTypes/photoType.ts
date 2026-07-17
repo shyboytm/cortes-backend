@@ -53,6 +53,9 @@ export const photoType = defineType({
       title: 'Date Taken',
       type: 'date',
       description: 'Optional. When the photo was actually shot. Shown in the lightbox.',
+      // Just controls how the date picker displays/enters the date in the
+      // Studio UI; the stored value is still a plain ISO date string.
+      options: {dateFormat: 'MM DD YYYY'},
     }),
     defineField({
       name: 'settings',
