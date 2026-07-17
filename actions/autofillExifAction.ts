@@ -1,4 +1,5 @@
 import {useState} from 'react'
+import {parse as parseExif} from 'exifr'
 import {useClient, useDocumentOperation} from 'sanity'
 import type {DocumentActionComponent, DocumentActionProps} from 'sanity'
 
@@ -10,19 +11,28 @@ interface PhotoDraftLike {
   image?: {asset?: PhotoAssetRef}
 }
 
-// Converts an EXIF "YYYY:MM:DD HH:MM:SS" timestamp into the "YYYY-MM-DD"
-// format the dateTaken field expects.
-function parseExifDate(raw: string): string | null {
-  const match = raw.match(/^(\d{4}):(\d{2}):(\d{2})/)
-  return match ? `${match[1]}-${match[2]}-${match[3]}` : null
+// Formats a Date (exifr revives EXIF date tags into Date objects by
+// default) or a raw EXIF "YYYY:MM:DD HH:MM:SS" string into the "YYYY-MM-DD"
+// the dateTaken field expects.
+function formatExifDate(value: unknown): string | null {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return value.toISOString().slice(0, 10)
+  }
+  if (typeof value === 'string') {
+    const match = value.match(/^(\d{4}):(\d{2}):(\d{2})/)
+    if (match) return `${match[1]}-${match[2]}-${match[3]}`
+  }
+  return null
 }
 
 // Custom Studio action on the Photo document type: reads the uploaded
 // image's EXIF data (camera make/model, lens, and the date it was shot)
 // and fills in the camera/lens/dateTaken fields if they're currently
-// empty, so the photographer doesn't have to type them in by hand. Only
-// shows up once an image has actually been uploaded, since EXIF lives on
-// the image asset rather than the document itself.
+// empty, so the photographer doesn't have to type them in by hand. Sanity
+// doesn't extract EXIF into its own asset metadata, so this fetches the
+// original file's URL and parses it directly with the exifr library
+// instead of reading `asset->metadata.exif` (which doesn't exist). Only
+// shows up once an image has actually been uploaded.
 // Named in PascalCase (rather than the file's camelCase export name) since
 // Sanity renders document actions as React components under the hood, and
 // the react-hooks lint rule requires component-shaped names to allow the
@@ -48,26 +58,31 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
     onHandle: async () => {
       setIsRunning(true)
       try {
-        const asset = await client.fetch<{exif?: Record<string, unknown>} | null>(
-          `*[_id == $assetId][0]{"exif": metadata.exif}`,
-          {assetId: assetRef}
-        )
-        const exif = asset?.exif ?? {}
-        const patchSet: Record<string, string> = {}
+        const asset = await client.fetch<{url?: string} | null>(`*[_id == $assetId][0]{url}`, {
+          assetId: assetRef,
+        })
+        if (!asset?.url) throw new Error("Could not find this photo's file URL.")
 
-        const make = typeof exif.Make === 'string' ? exif.Make.trim() : ''
-        const model = typeof exif.Model === 'string' ? exif.Model.trim() : ''
+        const tags = await parseExif(asset.url, [
+          'Make',
+          'Model',
+          'LensModel',
+          'LensMake',
+          'DateTimeOriginal',
+          'CreateDate',
+        ])
+
+        const patchSet: Record<string, string> = {}
+        const make = typeof tags?.Make === 'string' ? tags.Make.trim() : ''
+        const model = typeof tags?.Model === 'string' ? tags.Model.trim() : ''
         const camera = [make, model].filter(Boolean).join(' ')
         if (camera) patchSet.camera = camera
 
-        const lens = exif.LensModel
+        const lens = tags?.LensModel
         if (typeof lens === 'string' && lens.trim()) patchSet.lens = lens.trim()
 
-        const rawDate = exif.DateTimeOriginal ?? exif.DateTime
-        if (typeof rawDate === 'string') {
-          const parsed = parseExifDate(rawDate)
-          if (parsed) patchSet.dateTaken = parsed
-        }
+        const dateTaken = formatExifDate(tags?.DateTimeOriginal ?? tags?.CreateDate)
+        if (dateTaken) patchSet.dateTaken = dateTaken
 
         const filledFields = Object.keys(patchSet)
         if (filledFields.length > 0) {
@@ -77,7 +92,7 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
           setResultMessage(`Filled in: ${filledFields.join(', ')}.`)
         } else {
           setResultMessage(
-            "No camera/lens/date data was found in this image's metadata. If you just uploaded it, Sanity may still be processing it, wait a few seconds and try again. Some images (screenshots, re-saved exports, messaging-app downloads) never carry this data to begin with."
+            "No camera/lens/date data was found in this image's file. Some images (screenshots, re-saved exports, messaging-app downloads) never carry this data to begin with."
           )
         }
       } catch (error) {
