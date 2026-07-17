@@ -55,6 +55,12 @@ export const photoType = defineType({
       description: 'Optional. When the photo was actually shot. Shown in the lightbox.',
     }),
     defineField({
+      name: 'settings',
+      title: 'Settings',
+      type: 'string',
+      description: 'Optional. Shutter speed, aperture, and ISO used, e.g. "1/200s · f/2.8 · ISO 200". Shown in the lightbox.',
+    }),
+    defineField({
       name: 'order',
       type: 'number',
       description: 'Controls ordering on the Photos page: lower numbers show first. Leave blank to sort newest first.',

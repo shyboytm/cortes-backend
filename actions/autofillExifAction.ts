@@ -12,19 +12,35 @@ interface PhotoDraftLike {
 
 interface AssetMetadata {
   image?: {Make?: string; Model?: string}
-  exif?: {LensModel?: string; LensMake?: string; DateTimeOriginal?: string; DateTimeDigitized?: string}
+  exif?: {
+    LensModel?: string
+    LensMake?: string
+    DateTimeOriginal?: string
+    DateTimeDigitized?: string
+    ExposureTime?: number
+    FNumber?: number
+    ISO?: number
+  }
+}
+
+// Formats a decimal exposure time in seconds (e.g. 0.005) as the
+// fraction photographers actually read (e.g. "1/200s").
+function formatShutterSpeed(exposureTime: number): string | null {
+  if (!Number.isFinite(exposureTime) || exposureTime <= 0) return null
+  if (exposureTime >= 1) return `${Number(exposureTime.toFixed(1))}s`
+  return `1/${Math.round(1 / exposureTime)}s`
 }
 
 // Custom Studio action on the Photo document type: reads the uploaded
-// image's camera/lens/date metadata — extracted natively by Sanity at
-// upload time, per the `options.metadata` list on the image field in
-// photoType.ts — and fills in the camera/lens/dateTaken fields if they're
-// currently empty, so the photographer doesn't have to type them in by
-// hand. Sanity excludes this data by default (it can contain private info
-// like GPS location) and only starts extracting it going forward from
-// when the schema opts in, so photos uploaded before that change need to
-// be re-uploaded to pick it up. Only shows up once an image has actually
-// been uploaded.
+// image's camera/lens/date/settings metadata — extracted natively by
+// Sanity at upload time, per the `options.metadata` list on the image
+// field in photoType.ts — and fills in the camera/lens/dateTaken/settings
+// fields if they're currently empty, so the photographer doesn't have to
+// type them in by hand. Sanity excludes this data by default (it can
+// contain private info like GPS location) and only starts extracting it
+// going forward from when the schema opts in, so photos uploaded before
+// that change need to be re-uploaded to pick it up. Only shows up once an
+// image has actually been uploaded.
 // Named in PascalCase (rather than the file's camelCase export name) since
 // Sanity renders document actions as React components under the hood, and
 // the react-hooks lint rule requires component-shaped names to allow the
@@ -45,7 +61,7 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
   if (!assetRef) return null
 
   return {
-    label: isRunning ? 'Reading photo metadata…' : 'Autofill camera/lens from photo',
+    label: isRunning ? 'Reading photo metadata…' : 'Autofill camera/lens/settings from photo',
     disabled: isRunning,
     onHandle: async () => {
       setIsRunning(true)
@@ -79,6 +95,14 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
           patchSet.dateTaken = rawDate.slice(0, 10)
         }
 
+        const shutterSpeed =
+          typeof asset?.exif?.ExposureTime === 'number' ? formatShutterSpeed(asset.exif.ExposureTime) : null
+        const aperture =
+          typeof asset?.exif?.FNumber === 'number' ? `f/${Number(asset.exif.FNumber.toFixed(1))}` : null
+        const iso = typeof asset?.exif?.ISO === 'number' ? `ISO ${asset.exif.ISO}` : null
+        const settings = [shutterSpeed, aperture, iso].filter(Boolean).join(' · ')
+        if (settings) patchSet.settings = settings
+
         const filledFields = Object.keys(patchSet)
         const hasAnyMetadata = Boolean(asset?.image || asset?.exif)
 
@@ -92,11 +116,11 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
           // Surfacing it raw makes it possible to see what to add support
           // for, instead of guessing blind.
           setResultMessage(
-            `Found metadata on this file, but none matched camera/lens/date. Raw: ${JSON.stringify(asset)}`
+            `Found metadata on this file, but none matched camera/lens/date/settings. Raw: ${JSON.stringify(asset)}`
           )
         } else {
           setResultMessage(
-            "No camera/lens/date data was found for this photo. Either the file itself never carried it (screenshots, re-saved exports, and messaging-app downloads usually don't), or it was uploaded before camera/lens metadata extraction was turned on for this schema, in which case re-uploading the image will pick it up. Metadata is also generated asynchronously right after upload, so if you just uploaded this photo, wait a few seconds and try again."
+            "No camera/lens/date/settings data was found for this photo. Either the file itself never carried it (screenshots, re-saved exports, and messaging-app downloads usually don't), or it was uploaded before camera/lens metadata extraction was turned on for this schema, in which case re-uploading the image will pick it up. Metadata is also generated asynchronously right after upload, so if you just uploaded this photo, wait a few seconds and try again."
           )
         }
       } catch (error) {
