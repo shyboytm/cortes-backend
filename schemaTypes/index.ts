@@ -10,10 +10,9 @@ import {serviceType} from './serviceType'
 import {testimonialType} from './testimonialType'
 import {workType} from './workType'
 
-// Kept in alphabetical order by document title (Client, Feed, Music
+// Array is in alphabetical order by document title (Client, Feed, Music
 // Release, Page, Post, Press Mention, Recommendation, Service, Testimonial,
-// Work) — the Studio's default document list follows this array's order,
-// so this is what keeps the dashboard's type list sorted A-Z.
+// Work). The Studio's default document list follows this array's order.
 export const schemaTypes = [
   clientType,
   feedItemType,
