@@ -63,11 +63,25 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
         })
         if (!asset?.url) throw new Error("Could not find this photo's file URL.")
 
+        // Fetch the file's bytes ourselves rather than handing exifr the bare
+        // URL. When exifr parses a URL directly in the browser, it issues a
+        // Range request (to only download the first chunk it needs) — a
+        // non-simple request that requires a CORS preflight, which
+        // cdn.sanity.io doesn't reliably answer for arbitrary Studio origins.
+        // A plain `fetch` with no custom headers is a "simple" request that
+        // only needs Access-Control-Allow-Origin, which the CDN does send,
+        // so this sidesteps the Range/preflight failure entirely.
+        const response = await fetch(asset.url)
+        if (!response.ok) {
+          throw new Error(`Could not download the photo file (status ${response.status}).`)
+        }
+        const buffer = await response.arrayBuffer()
+
         // No pick filter here (unlike an earlier version of this action):
         // parsing everything first, rather than only the handful of fields
         // we ultimately want, makes it possible to tell "the file genuinely
         // has no metadata" apart from "we're reading the wrong tag names."
-        const tags = await parseExif(asset.url)
+        const tags = await parseExif(buffer)
         const tagEntries = tags ? Object.entries(tags) : []
 
         const patchSet: Record<string, string> = {}
@@ -97,7 +111,7 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
           )
         } else {
           setResultMessage(
-            `No metadata at all was read from this file (URL: ${asset.url}). This usually means the browser couldn't read the file's bytes (a network or CORS issue), rather than the file itself lacking EXIF data.`
+            `No metadata at all was read from this file (downloaded ${buffer.byteLength} bytes from ${asset.url}). The file's bytes were read successfully, so this means the file itself has no EXIF data — some images (screenshots, re-saved exports, messaging-app downloads) never carry it.`
           )
         }
       } catch (error) {
