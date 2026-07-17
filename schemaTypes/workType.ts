@@ -52,6 +52,14 @@ export const workType = defineType({
       description: 'Controls homepage ordering: lower numbers show first. Leave blank to sort newest first.',
     }),
     defineField({
+      name: 'comingSoon',
+      title: 'Coming Soon',
+      type: 'boolean',
+      initialValue: false,
+      description:
+        'Optional. When on, this project shows a "Coming soon" tag instead of a link on the homepage and Work index, and its case study page isn\'t publicly reachable — so you can keep building it out without it being live yet.',
+    }),
+    defineField({
       name: 'mainImage',
       title: 'Main Image',
       type: 'image',
@@ -123,6 +131,30 @@ export const workType = defineType({
               type: 'string',
               description: 'Describe the image for accessibility and SEO.',
             }),
+            defineField({
+              name: 'caption',
+              title: 'Caption',
+              type: 'string',
+              description: 'Optional italic caption shown under the image on the site.',
+            }),
+            defineField({
+              name: 'size',
+              title: 'Layout',
+              type: 'string',
+              description: 'How this image sits in the case study: inset (matches the text column), half '
+                + '(pairs side-by-side with the next half-width image), wide (breaks past the text '
+                + 'column), or full (edge-to-edge bleed).',
+              options: {
+                list: [
+                  {title: 'Inset (default)', value: 'inset'},
+                  {title: 'Half width', value: 'half'},
+                  {title: 'Wide', value: 'wide'},
+                  {title: 'Full bleed', value: 'full'},
+                ],
+                layout: 'radio',
+              },
+              initialValue: 'inset',
+            }),
           ],
         },
       ],
@@ -133,6 +165,14 @@ export const workType = defineType({
       title: 'title',
       subtitle: 'dateRange',
       media: 'mainImage',
+      comingSoon: 'comingSoon',
+    },
+    prepare({title, subtitle, media, comingSoon}) {
+      return {
+        title,
+        subtitle: comingSoon ? `${subtitle} · Coming soon` : subtitle,
+        media,
+      }
     },
   },
 })
