@@ -120,7 +120,19 @@ export const workType = defineType({
       description:
         'Optional. Write the full case study for this project here, text and images can be mixed freely. If this has any content, this project\'s homepage thumbnail becomes clickable and links to its case study page. Leave empty to keep it as a static preview.',
       of: [
-        {type: 'block'},
+        {
+          type: 'block',
+          styles: [
+            {title: 'Normal', value: 'normal'},
+            {title: 'H1', value: 'h1'},
+            {title: 'H2', value: 'h2'},
+            {title: 'H3', value: 'h3'},
+            {title: 'H4', value: 'h4'},
+            {title: 'H5', value: 'h5'},
+            {title: 'H6', value: 'h6'},
+            {title: 'Quote', value: 'blockquote'},
+          ],
+        },
         {
           type: 'image',
           options: {hotspot: true},
@@ -145,7 +157,8 @@ export const workType = defineType({
                 + 'or third (pairs with 1 or 2 more images of the same size right after it, side-by-side), '
                 + 'wide (breaks past the text column), full (edge-to-edge bleed), or offset left (pins the '
                 + 'image in a sticky left column while every block after it, headings and images included, '
-                + 'runs alongside it in a right column, until the next offset-left image starts a new pair).',
+                + 'runs alongside it in a right column, until the next offset-left image or an "End offset '
+                + 'image" marker below it ends the pairing).',
               options: {
                 list: [
                   {title: 'Inset (default)', value: 'inset'},
@@ -160,6 +173,29 @@ export const workType = defineType({
               initialValue: 'inset',
             }),
           ],
+        },
+        {
+          type: 'object',
+          name: 'endOffset',
+          title: 'End Offset Image',
+          description:
+            'Insert this where you want an "Offset left" image above to stop being pinned, so it '
+            + 'doesn\'t stay stuck for the rest of the case study. Everything after this marker goes back '
+            + 'to normal full-column flow. Doesn\'t render anything itself.',
+          fields: [
+            defineField({
+              name: 'note',
+              type: 'string',
+              hidden: true,
+              readOnly: true,
+              initialValue: 'Ends the sticky offset-left image above this point.',
+            }),
+          ],
+          preview: {
+            prepare() {
+              return {title: 'End offset image', subtitle: 'Stops the pinned image above this point'}
+            },
+          },
         },
       ],
     }),
