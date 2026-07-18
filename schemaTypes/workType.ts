@@ -143,8 +143,9 @@ export const workType = defineType({
               type: 'string',
               description: 'How this image sits in the case study: inset (matches the text column), half '
                 + 'or third (pairs with 1 or 2 more images of the same size right after it, side-by-side), '
-                + 'wide (breaks past the text column), full (edge-to-edge bleed), or offset left/right '
-                + '(breaks out past the column on just one side, text stays put on the other).',
+                + 'wide (breaks past the text column), full (edge-to-edge bleed), or offset left (pins the '
+                + 'image in a sticky left column while every block after it, headings and images included, '
+                + 'runs alongside it in a right column, until the next offset-left image starts a new pair).',
               options: {
                 list: [
                   {title: 'Inset (default)', value: 'inset'},
@@ -152,8 +153,7 @@ export const workType = defineType({
                   {title: 'Third width (3 across)', value: 'third'},
                   {title: 'Wide', value: 'wide'},
                   {title: 'Full bleed', value: 'full'},
-                  {title: 'Offset left', value: 'offsetLeft'},
-                  {title: 'Offset right', value: 'offsetRight'},
+                  {title: 'Offset left (pins image, text runs alongside)', value: 'offsetLeft'},
                 ],
                 layout: 'radio',
               },
