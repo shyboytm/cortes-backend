@@ -142,14 +142,18 @@ export const workType = defineType({
               title: 'Layout',
               type: 'string',
               description: 'How this image sits in the case study: inset (matches the text column), half '
-                + '(pairs side-by-side with the next half-width image), wide (breaks past the text '
-                + 'column), or full (edge-to-edge bleed).',
+                + 'or third (pairs with 1 or 2 more images of the same size right after it, side-by-side), '
+                + 'wide (breaks past the text column), full (edge-to-edge bleed), or offset left/right '
+                + '(breaks out past the column on just one side, text stays put on the other).',
               options: {
                 list: [
                   {title: 'Inset (default)', value: 'inset'},
-                  {title: 'Half width', value: 'half'},
+                  {title: 'Half width (2 across)', value: 'half'},
+                  {title: 'Third width (3 across)', value: 'third'},
                   {title: 'Wide', value: 'wide'},
                   {title: 'Full bleed', value: 'full'},
+                  {title: 'Offset left', value: 'offsetLeft'},
+                  {title: 'Offset right', value: 'offsetRight'},
                 ],
                 layout: 'radio',
               },
