@@ -70,6 +70,16 @@ export const photoType = defineType({
       description: 'Optional. Where the photo was taken, e.g. "Nashville, TN". Shown in the lightbox.',
     }),
     defineField({
+      name: 'printsUrl',
+      title: 'Buy Print Link',
+      type: 'url',
+      description:
+        'Optional. Where to buy a print of this photo, e.g. a link to Etsy, Society6, or your own print shop. '
+        + 'If set, a "Buy Print" button shows up in the lightbox. This site never sells or handles checkout itself, '
+        + 'it just links out.',
+      validation: (rule) => rule.uri({scheme: ['http', 'https']}),
+    }),
+    defineField({
       name: 'order',
       type: 'number',
       description: 'Controls ordering on the Photos page: lower numbers show first. Leave blank to sort newest first.',
