@@ -52,6 +52,14 @@ export const workType = defineType({
       description: 'Controls homepage ordering: lower numbers show first. Leave blank to sort newest first.',
     }),
     defineField({
+      name: 'likes',
+      title: 'Likes',
+      type: 'number',
+      initialValue: 0,
+      readOnly: true,
+      description: 'Incremented (or decremented) by the like button on this project\'s case study page, not meant to be edited by hand.',
+    }),
+    defineField({
       name: 'comingSoon',
       title: 'Coming Soon',
       type: 'boolean',
