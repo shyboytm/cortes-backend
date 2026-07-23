@@ -44,6 +44,24 @@ function toTitleCase(value: string): string {
     .join(' ')
 }
 
+// Swaps a plain "f"/"F" for the proper aperture symbol "ƒ" wherever it's
+// acting as an f-number (e.g. "f1.4" -> "ƒ1.4", "f/2.8" -> "ƒ/2.8",
+// "F2.8" -> "ƒ2.8"). Only applied to `lens`, since that field is raw
+// manufacturer text (not something this file templates itself) and lens
+// names routinely contain other, unrelated f/F characters — e.g. "Fujifilm
+// XF23mmF2.8 R WR" has an "F" baked into the mount/model code ("XF23mm")
+// directly butted up against the real aperture ("F2.8") with no separator,
+// so there's no leading word boundary to lean on. Instead this only checks
+// the *trailing* boundary: f/F (with an optional "/") immediately followed
+// by digits, where what comes right after those digits is a boundary (space,
+// punctuation, or string end) rather than more letters. That's what
+// excludes "F23mm" (the "3" and "m" are both word characters, so there's no
+// boundary between them) while still matching "F2.8" right before a space,
+// "R", or the end of the string.
+function withFStop(value: string): string {
+  return value.replace(/f(\/?)(\d+(?:\.\d+)?)\b/gi, 'ƒ$1$2')
+}
+
 // Custom Studio action on the Photo document type: reads the uploaded
 // image's camera/lens/date/settings metadata — extracted natively by
 // Sanity at upload time, per the `options.metadata` list on the image
@@ -99,7 +117,7 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
         if (camera) patchSet.camera = camera
 
         const lens = asset?.exif?.LensModel?.trim() || asset?.exif?.LensMake?.trim()
-        if (lens) patchSet.lens = lens
+        if (lens) patchSet.lens = withFStop(lens)
 
         // DateTimeOriginal/DateTimeDigitized come back as ISO date strings
         // (e.g. "2020-03-19T12:25:17.000Z"); dateTaken just wants the date.
@@ -111,7 +129,7 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
         const shutterSpeed =
           typeof asset?.exif?.ExposureTime === 'number' ? formatShutterSpeed(asset.exif.ExposureTime) : null
         const aperture =
-          typeof asset?.exif?.FNumber === 'number' ? `f/${Number(asset.exif.FNumber.toFixed(1))}` : null
+          typeof asset?.exif?.FNumber === 'number' ? `ƒ/${Number(asset.exif.FNumber.toFixed(1))}` : null
         const iso = typeof asset?.exif?.ISO === 'number' ? `ISO ${asset.exif.ISO}` : null
         const settings = [shutterSpeed, aperture, iso].filter(Boolean).join(' · ')
         if (settings) patchSet.settings = settings

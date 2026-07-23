@@ -46,7 +46,7 @@ export const photoType = defineType({
       name: 'lens',
       title: 'Lens',
       type: 'string',
-      description: 'Optional. Lens used, e.g. "Fujifilm XF23mmF2.8 R WR". Shown in the lightbox.',
+      description: 'Optional. Lens used, e.g. "Fujifilm XF23mmƒ2.8 R WR". Shown in the lightbox.',
     }),
     defineField({
       name: 'dateTaken',
@@ -61,7 +61,7 @@ export const photoType = defineType({
       name: 'settings',
       title: 'Settings',
       type: 'string',
-      description: 'Optional. Shutter speed, aperture, and ISO used, e.g. "1/200s · f/2.8 · ISO 200". Shown in the lightbox.',
+      description: 'Optional. Shutter speed, aperture, and ISO used, e.g. "1/200s · ƒ/2.8 · ISO 200". Shown in the lightbox.',
     }),
     defineField({
       name: 'location',
