@@ -114,10 +114,22 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
         const make = asset?.image?.Make?.trim() ? toTitleCase(asset.image.Make.trim()) : ''
         const model = asset?.image?.Model?.trim() ?? ''
         const camera = [make, model].filter(Boolean).join(' ')
-        if (camera) patchSet.camera = camera
 
-        const lens = asset?.exif?.LensModel?.trim() || asset?.exif?.LensMake?.trim()
-        if (lens) patchSet.lens = withFStop(lens)
+        // The GR IIIx HDF's raw EXIF make/model always comes back as this
+        // exact string — title-casing alone still leaves an awkward,
+        // redundant "Ricoh Imaging Company, Ltd. RICOH GR IIIx HDF" rather
+        // than the cleaner name used elsewhere on the site. It's also a
+        // fixed-lens camera (no interchangeable lens), so LensModel/LensMake
+        // come back empty from EXIF — special-cased here too rather than
+        // left blank.
+        if (camera === 'Ricoh Imaging Company, Ltd. RICOH GR IIIx HDF') {
+          patchSet.camera = 'Ricoh GR IIIx HDF'
+          patchSet.lens = 'Ricoh ƒ2.8 lens'
+        } else {
+          if (camera) patchSet.camera = camera
+          const lens = asset?.exif?.LensModel?.trim() || asset?.exif?.LensMake?.trim()
+          if (lens) patchSet.lens = withFStop(lens)
+        }
 
         // DateTimeOriginal/DateTimeDigitized come back as ISO date strings
         // (e.g. "2020-03-19T12:25:17.000Z"); dateTaken just wants the date.
