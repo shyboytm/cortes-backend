@@ -2,6 +2,7 @@ import {clientType} from './clientType'
 import {experienceType} from './experienceType'
 import {feedItemType} from './feedItemType'
 import {musicReleaseType} from './musicReleaseType'
+import {pageMetaType} from './pageMetaType'
 import {pageType} from './pageType'
 import {photoType} from './photoType'
 import {postType} from './postType'
@@ -13,15 +14,16 @@ import {testimonialType} from './testimonialType'
 import {workType} from './workType'
 
 // Array is in alphabetical order by document title (Client, Experience,
-// Feed, Music Release, Page, Photo, Post, Press Mention, Product,
-// Recommendation, Service, Testimonial, Work). The Studio's default document
-// list follows this array's order.
+// Feed, Music Release, Page, Page Metadata, Photo, Post, Press Mention,
+// Product, Recommendation, Service, Testimonial, Work). The Studio's default
+// document list follows this array's order.
 export const schemaTypes = [
   clientType,
   experienceType,
   feedItemType,
   musicReleaseType,
   pageType,
+  pageMetaType,
   photoType,
   postType,
   pressMentionType,
