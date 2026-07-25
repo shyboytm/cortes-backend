@@ -1,5 +1,22 @@
 import {defineField, defineType} from 'sanity'
 
+// Shared by the image, uploaded-video, and video-embed case-study blocks
+// below so their "Layout" field stays in lockstep — same options, same
+// default, same radio layout — without maintaining three copies of the
+// list. Mirrors the identical constant in postType.ts (the blog post
+// schema uses this same body-array pattern).
+const mediaLayoutOptions = {
+  list: [
+    {title: 'Inset (default)', value: 'inset'},
+    {title: 'Half width (2 across)', value: 'half'},
+    {title: 'Third width (3 across)', value: 'third'},
+    {title: 'Wide', value: 'wide'},
+    {title: 'Full bleed', value: 'full'},
+    {title: 'Offset left (pins it, text runs alongside)', value: 'offsetLeft'},
+  ],
+  layout: 'radio' as const,
+}
+
 export const workType = defineType({
   name: 'work',
   title: 'Work',
@@ -162,46 +179,105 @@ export const workType = defineType({
               title: 'Layout',
               type: 'string',
               description: 'How this image sits in the case study: inset (matches the text column), half '
-                + 'or third (pairs with 1 or 2 more images of the same size right after it, side-by-side), '
-                + 'wide (breaks past the text column), full (edge-to-edge bleed), or offset left (pins the '
-                + 'image in a sticky left column while every block after it, headings and images included, '
-                + 'runs alongside it in a right column, until the next offset-left image or an "End offset '
-                + 'image" marker below it ends the pairing).',
-              options: {
-                list: [
-                  {title: 'Inset (default)', value: 'inset'},
-                  {title: 'Half width (2 across)', value: 'half'},
-                  {title: 'Third width (3 across)', value: 'third'},
-                  {title: 'Wide', value: 'wide'},
-                  {title: 'Full bleed', value: 'full'},
-                  {title: 'Offset left (pins image, text runs alongside)', value: 'offsetLeft'},
-                ],
-                layout: 'radio',
-              },
+                + 'or third (pairs with 1 or 2 more images or videos of the same size right after it, '
+                + 'side-by-side), wide (breaks past the text column), full (edge-to-edge bleed), or offset '
+                + 'left (pins the image in a sticky left column while every block after it, headings and '
+                + 'images included, runs alongside it in a right column, until the next offset-left image/'
+                + 'video or an "End offset" marker below it ends the pairing).',
+              options: mediaLayoutOptions,
+              initialValue: 'inset',
+            }),
+          ],
+        },
+        {
+          type: 'file',
+          name: 'video',
+          title: 'Video',
+          options: {accept: 'video/*'},
+          fields: [
+            defineField({
+              name: 'caption',
+              title: 'Caption',
+              type: 'string',
+              description: 'Optional italic caption shown under the video on the site.',
+            }),
+            defineField({
+              name: 'size',
+              title: 'Layout',
+              type: 'string',
+              description: 'How this video sits in the case study: inset (matches the text column), half '
+                + 'or third (pairs with 1 or 2 more images or videos of the same size right after it, '
+                + 'side-by-side), wide (breaks past the text column), full (edge-to-edge bleed), or offset '
+                + 'left (pins the video in a sticky left column while every block after it, headings and '
+                + 'images included, runs alongside it in a right column, until the next offset-left image/'
+                + 'video or an "End offset" marker below it ends the pairing).',
+              options: mediaLayoutOptions,
               initialValue: 'inset',
             }),
           ],
         },
         {
           type: 'object',
+          name: 'videoEmbed',
+          title: 'Video Embed (YouTube/Vimeo link)',
+          fields: [
+            defineField({
+              name: 'url',
+              title: 'Video URL',
+              type: 'url',
+              description:
+                'Paste a YouTube or Vimeo link — the watch page, a share link, or a youtu.be short '
+                + 'link all work. Anything else renders as a plain "Watch video" link instead of an '
+                + 'embedded player.',
+              validation: (rule) => rule.required().uri({scheme: ['http', 'https']}),
+            }),
+            defineField({
+              name: 'caption',
+              title: 'Caption',
+              type: 'string',
+              description: 'Optional italic caption shown under the video on the site.',
+            }),
+            defineField({
+              name: 'size',
+              title: 'Layout',
+              type: 'string',
+              description: 'How this video sits in the case study: inset (matches the text column), half '
+                + 'or third (pairs with 1 or 2 more images or videos of the same size right after it, '
+                + 'side-by-side), wide (breaks past the text column), full (edge-to-edge bleed), or offset '
+                + 'left (pins the video in a sticky left column while every block after it, headings and '
+                + 'images included, runs alongside it in a right column, until the next offset-left image/'
+                + 'video or an "End offset" marker below it ends the pairing).',
+              options: mediaLayoutOptions,
+              initialValue: 'inset',
+            }),
+          ],
+          preview: {
+            select: {url: 'url', caption: 'caption'},
+            prepare({url, caption}: {url?: string; caption?: string}) {
+              return {title: caption || 'Video embed', subtitle: url}
+            },
+          },
+        },
+        {
+          type: 'object',
           name: 'endOffset',
-          title: 'End Offset Image',
+          title: 'End Offset Media',
           description:
-            'Insert this where you want an "Offset left" image above to stop being pinned, so it '
-            + 'doesn\'t stay stuck for the rest of the case study. Everything after this marker goes back '
-            + 'to normal full-column flow. Doesn\'t render anything itself.',
+            'Insert this where you want an "Offset left" image, video, or video embed above to stop '
+            + 'being pinned, so it doesn\'t stay stuck for the rest of the case study. Everything after '
+            + 'this marker goes back to normal full-column flow. Doesn\'t render anything itself.',
           fields: [
             defineField({
               name: 'note',
               type: 'string',
               hidden: true,
               readOnly: true,
-              initialValue: 'Ends the sticky offset-left image above this point.',
+              initialValue: 'Ends the sticky offset-left image/video above this point.',
             }),
           ],
           preview: {
             prepare() {
-              return {title: 'End offset image', subtitle: 'Stops the pinned image above this point'}
+              return {title: 'End offset media', subtitle: 'Stops the pinned image/video above this point'}
             },
           },
         },
