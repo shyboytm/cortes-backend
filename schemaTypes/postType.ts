@@ -1,8 +1,8 @@
 import {defineField, defineType} from 'sanity'
 
-// Shared by both the image and video body blocks below so their "Layout"
-// field stays in lockstep — same options, same default, same radio layout —
-// without maintaining two copies of the list.
+// Shared by the image, uploaded-video, and video-embed body blocks below so
+// their "Layout" field stays in lockstep — same options, same default, same
+// radio layout — without maintaining three copies of the list.
 const mediaLayoutOptions = {
   list: [
     {title: 'Inset (default)', value: 'inset'},
@@ -126,12 +126,54 @@ export const postType = defineType({
         },
         {
           type: 'object',
+          name: 'videoEmbed',
+          title: 'Video Embed (YouTube/Vimeo link)',
+          fields: [
+            defineField({
+              name: 'url',
+              title: 'Video URL',
+              type: 'url',
+              description:
+                'Paste a YouTube or Vimeo link — the watch page, a share link, or a youtu.be short '
+                + 'link all work. Anything else renders as a plain "Watch video" link instead of an '
+                + 'embedded player.',
+              validation: (rule) => rule.required().uri({scheme: ['http', 'https']}),
+            }),
+            defineField({
+              name: 'caption',
+              title: 'Caption',
+              type: 'string',
+              description: 'Optional italic caption shown under the video on the site.',
+            }),
+            defineField({
+              name: 'size',
+              title: 'Layout',
+              type: 'string',
+              description: 'How this video sits in the post: inset (matches the text column), half or '
+                + 'third (pairs with 1 or 2 more images or videos of the same size right after it, '
+                + 'side-by-side), wide (breaks past the text column), full (edge-to-edge bleed), or offset '
+                + 'left (pins the video in a sticky left column while every block after it, headings and '
+                + 'images included, runs alongside it in a right column, until the next offset-left image/'
+                + 'video or an "End offset" marker below it ends the pairing).',
+              options: mediaLayoutOptions,
+              initialValue: 'inset',
+            }),
+          ],
+          preview: {
+            select: {url: 'url', caption: 'caption'},
+            prepare({url, caption}: {url?: string; caption?: string}) {
+              return {title: caption || 'Video embed', subtitle: url}
+            },
+          },
+        },
+        {
+          type: 'object',
           name: 'endOffset',
           title: 'End Offset Media',
           description:
-            'Insert this where you want an "Offset left" image or video above to stop being pinned, so '
-            + 'it doesn\'t stay stuck for the rest of the post. Everything after this marker goes back to '
-            + 'normal full-column flow. Doesn\'t render anything itself.',
+            'Insert this where you want an "Offset left" image, video, or video embed above to stop '
+            + 'being pinned, so it doesn\'t stay stuck for the rest of the post. Everything after this '
+            + 'marker goes back to normal full-column flow. Doesn\'t render anything itself.',
           fields: [
             defineField({
               name: 'note',
