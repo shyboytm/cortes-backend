@@ -12,6 +12,18 @@ const mediaLayoutOptions = {
   layout: 'radio' as const,
 }
 
+const imageAspectRatioOptions = {
+  list: [
+    {title: 'Original', value: 'original'},
+    {title: 'Square (1:1)', value: '1:1'},
+    {title: 'Standard (4:3)', value: '4:3'},
+    {title: 'Classic (3:2)', value: '3:2'},
+    {title: 'Widescreen (16:9)', value: '16:9'},
+    {title: 'Portrait (9:16)', value: '9:16'},
+  ],
+  layout: 'radio' as const,
+}
+
 export const postType = defineType({
   name: 'post',
   title: 'Post',
@@ -91,6 +103,14 @@ export const postType = defineType({
                 + 'video or an "End offset image" marker below it ends the pairing).',
               options: mediaLayoutOptions,
               initialValue: 'inset',
+            }),
+            defineField({
+              name: 'ratio',
+              title: 'Aspect Ratio',
+              type: 'string',
+              description: 'Crop the image to this ratio, or leave as Original to use the image\'s natural ratio.',
+              options: imageAspectRatioOptions,
+              initialValue: 'original',
             }),
           ],
         },
