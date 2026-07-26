@@ -1,22 +1,3 @@
-// One-time bulk import for the "service" documents that power the Services
-// section on the Info page. Safe to delete after you've run it once.
-//
-// IMPORTANT: services-data.json has draft descriptions Claude wrote for each
-// service (you only gave the four titles) — review and edit them in Sanity
-// after import to make sure they sound like you.
-//
-// Setup (run these yourself — never share the token with anyone, including Claude):
-//   1. Go to https://www.sanity.io/manage, pick this project (m83idean),
-//      then API -> Tokens -> Add API token. Give it "Editor" permissions.
-//   2. Copy the token and export it in your terminal (don't put it in a file
-//      that gets committed):
-//        export SANITY_WRITE_TOKEN="sk..."
-//   3. Install dependencies if you haven't already:
-//        pnpm install
-//   4. Run the import:
-//        pnpm run import:services
-//
-// Safe to re-run — skips any service whose title already exists.
 
 import {createClient} from '@sanity/client'
 import {readFile} from 'node:fs/promises'

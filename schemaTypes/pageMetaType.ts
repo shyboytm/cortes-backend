@@ -1,13 +1,5 @@
 import {defineField, defineType} from 'sanity'
 
-// The site's static, non-post/case-study pages — the frontend already
-// hardcodes a sensible title/description for each of these, so every field
-// here is optional: leave any of them blank to keep the frontend's default
-// for that field, or fill one in to override just that piece for this page's
-// browser tab title and link-preview (social/iMessage/Slack unfurl) card.
-// Blog posts and Work case studies don't need an entry here — their
-// link-preview title/description/image already come from the post/case
-// study itself (its own title, first few lines of body, and main image).
 const PAGE_OPTIONS = [
   {title: 'Home', value: 'home'},
   {title: 'Work (index)', value: 'work'},

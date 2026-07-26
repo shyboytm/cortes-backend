@@ -18,8 +18,6 @@ export default defineConfig({
   },
 
   document: {
-    // Adds the EXIF autofill action to Photo documents alongside the
-    // framework's default actions (publish, discard, etc).
     actions: (prev, context) => (context.schemaType === 'photo' ? [...prev, AutofillExifAction] : prev),
   },
 })

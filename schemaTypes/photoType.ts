@@ -12,12 +12,6 @@ export const photoType = defineType({
       description: 'Shows up on the Photos page grid and in the lightbox. Any orientation works.',
       options: {
         hotspot: true,
-        // 'exif' and 'image' (camera/lens/date, aperture, etc.) are excluded
-        // by default since they can contain private info like GPS location —
-        // opting in here so the autofill action below has data to read.
-        // Sanity only extracts this at upload time, so it only applies to
-        // photos uploaded after this change; anything uploaded earlier needs
-        // to be re-uploaded to pick it up.
         metadata: ['blurhash', 'lqip', 'palette', 'exif', 'image'],
       },
       fields: [
@@ -53,8 +47,6 @@ export const photoType = defineType({
       title: 'Date Taken',
       type: 'date',
       description: 'Optional. When the photo was actually shot. Shown in the lightbox.',
-      // Just controls how the date picker displays/enters the date in the
-      // Studio UI; the stored value is still a plain ISO date string.
       options: {dateFormat: 'MM/DD/YYYY'},
     }),
     defineField({

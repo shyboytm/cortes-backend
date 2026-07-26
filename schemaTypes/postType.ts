@@ -1,8 +1,5 @@
 import {defineField, defineType} from 'sanity'
 
-// Shared by the image, uploaded-video, and video-embed body blocks below so
-// their "Layout" field stays in lockstep — same options, same default, same
-// radio layout — without maintaining three copies of the list.
 const mediaLayoutOptions = {
   list: [
     {title: 'Inset (default)', value: 'inset'},

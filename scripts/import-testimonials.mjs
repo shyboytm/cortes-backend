@@ -1,22 +1,3 @@
-// One-time bulk import for the "testimonial" documents that power the
-// "What Others Say" section on the Info page. Safe to delete after you've
-// run it once.
-//
-// testimonials-data.json is populated with the 6 quotes from the screenshot
-// you shared (Jimmy, Matt, Risa, John, Karlee, Sam), transcribed as-is.
-//
-// Setup (run these yourself — never share the token with anyone, including Claude):
-//   1. Go to https://www.sanity.io/manage, pick this project (m83idean),
-//      then API -> Tokens -> Add API token. Give it "Editor" permissions.
-//   2. Copy the token and export it in your terminal (don't put it in a file
-//      that gets committed):
-//        export SANITY_WRITE_TOKEN="sk..."
-//   3. Install dependencies if you haven't already:
-//        pnpm install
-//   4. Run the import:
-//        pnpm run import:testimonials
-//
-// Safe to re-run — skips any testimonial whose name already exists.
 
 import {createClient} from '@sanity/client'
 import {readFile} from 'node:fs/promises'

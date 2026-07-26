@@ -23,19 +23,12 @@ interface AssetMetadata {
   }
 }
 
-// Formats a decimal exposure time in seconds (e.g. 0.005) as the
-// fraction photographers actually read (e.g. "1/200s").
 function formatShutterSpeed(exposureTime: number): string | null {
   if (!Number.isFinite(exposureTime) || exposureTime <= 0) return null
   if (exposureTime >= 1) return `${Number(exposureTime.toFixed(1))}s`
   return `1/${Math.round(1 / exposureTime)}s`
 }
 
-// Camera makes usually come back from EXIF shouting in all-caps (e.g.
-// "RICOH IMAGING COMPANY, LTD."); this reads better title-cased ("Ricoh
-// Imaging Company, Ltd."). Only applied to the make, not the model — model
-// strings mix real words with alphanumeric codes (e.g. "GR IIIx HDF") that
-// title-casing would mangle.
 function toTitleCase(value: string): string {
   return value
     .toLowerCase()
@@ -44,45 +37,15 @@ function toTitleCase(value: string): string {
     .join(' ')
 }
 
-// Swaps a plain "f"/"F" for the proper aperture symbol "ƒ" wherever it's
-// acting as an f-number (e.g. "f1.4" -> "ƒ1.4", "f/2.8" -> "ƒ/2.8",
-// "F2.8" -> "ƒ2.8"). Only applied to `lens`, since that field is raw
-// manufacturer text (not something this file templates itself) and lens
-// names routinely contain other, unrelated f/F characters — e.g. "Fujifilm
-// XF23mmF2.8 R WR" has an "F" baked into the mount/model code ("XF23mm")
-// directly butted up against the real aperture ("F2.8") with no separator,
-// so there's no leading word boundary to lean on. Instead this only checks
-// the *trailing* boundary: f/F (with an optional "/") immediately followed
-// by digits, where what comes right after those digits is a boundary (space,
-// punctuation, or string end) rather than more letters. That's what
-// excludes "F23mm" (the "3" and "m" are both word characters, so there's no
-// boundary between them) while still matching "F2.8" right before a space,
-// "R", or the end of the string.
 function withFStop(value: string): string {
   return value.replace(/f(\/?)(\d+(?:\.\d+)?)\b/gi, 'ƒ$1$2')
 }
 
-// Custom Studio action on the Photo document type: reads the uploaded
-// image's camera/lens/date/settings metadata — extracted natively by
-// Sanity at upload time, per the `options.metadata` list on the image
-// field in photoType.ts — and fills in the camera/lens/dateTaken/settings
-// fields if they're currently empty, so the photographer doesn't have to
-// type them in by hand. Sanity excludes this data by default (it can
-// contain private info like GPS location) and only starts extracting it
-// going forward from when the schema opts in, so photos uploaded before
-// that change need to be re-uploaded to pick it up. Only shows up once an
-// image has actually been uploaded.
-// Named in PascalCase (rather than the file's camelCase export name) since
-// Sanity renders document actions as React components under the hood, and
-// the react-hooks lint rule requires component-shaped names to allow the
-// hook calls below.
 export const AutofillExifAction: DocumentActionComponent = (props: DocumentActionProps) => {
   const {id, type, draft, published, onComplete} = props
   const client = useClient({apiVersion: '2024-01-01'})
   const {patch} = useDocumentOperation(id, type)
   const [isRunning, setIsRunning] = useState(false)
-  // Shown in a dialog once the action finishes, since a silent success/no-op
-  // is otherwise indistinguishable from the button not doing anything.
   const [resultMessage, setResultMessage] = useState<string | null>(null)
 
   if (type !== 'photo') return null
@@ -97,14 +60,6 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
     onHandle: async () => {
       setIsRunning(true)
       try {
-        // Reads Sanity's own extracted metadata rather than re-downloading
-        // and re-parsing the file: an earlier version of this action fetched
-        // the raw CDN file and parsed it client-side with exifr, but that
-        // came back empty even for files with real EXIF, because Sanity's
-        // asset pipeline doesn't preserve camera/lens/date data in the
-        // stored file unless the schema explicitly asks for it at upload
-        // time (see photoType.ts). Asking for it there and reading it back
-        // here is the supported, reliable path.
         const asset = await client.fetch<AssetMetadata | null>(
           `*[_id == $assetId][0]{"image": metadata.image, "exif": metadata.exif}`,
           {assetId: assetRef}
@@ -115,13 +70,6 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
         const model = asset?.image?.Model?.trim() ?? ''
         const camera = [make, model].filter(Boolean).join(' ')
 
-        // The GR IIIx HDF's raw EXIF make/model always comes back as this
-        // exact string — title-casing alone still leaves an awkward,
-        // redundant "Ricoh Imaging Company, Ltd. RICOH GR IIIx HDF" rather
-        // than the cleaner name used elsewhere on the site. It's also a
-        // fixed-lens camera (no interchangeable lens), so LensModel/LensMake
-        // come back empty from EXIF — special-cased here too rather than
-        // left blank.
         if (camera === 'Ricoh Imaging Company, Ltd. RICOH GR IIIx HDF') {
           patchSet.camera = 'Ricoh GR IIIx HDF'
           patchSet.lens = 'Ricoh ƒ2.8 lens'
@@ -131,8 +79,6 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
           if (lens) patchSet.lens = withFStop(lens)
         }
 
-        // DateTimeOriginal/DateTimeDigitized come back as ISO date strings
-        // (e.g. "2020-03-19T12:25:17.000Z"); dateTaken just wants the date.
         const rawDate = asset?.exif?.DateTimeOriginal ?? asset?.exif?.DateTimeDigitized
         if (typeof rawDate === 'string' && rawDate.length >= 10) {
           patchSet.dateTaken = rawDate.slice(0, 10)
@@ -150,14 +96,9 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
         const hasAnyMetadata = Boolean(asset?.image || asset?.exif)
 
         if (filledFields.length > 0) {
-          // setIfMissing only fills fields that are currently empty, so this
-          // never clobbers a value the photographer already typed in by hand.
           patch.execute([{setIfMissing: patchSet}])
           setResultMessage(`Filled in: ${filledFields.join(', ')}.`)
         } else if (hasAnyMetadata) {
-          // Metadata was found, just not under the fields we look for.
-          // Surfacing it raw makes it possible to see what to add support
-          // for, instead of guessing blind.
           setResultMessage(
             `Found metadata on this file, but none matched camera/lens/date/settings. Raw: ${JSON.stringify(asset)}`
           )
@@ -174,9 +115,6 @@ export const AutofillExifAction: DocumentActionComponent = (props: DocumentActio
         setIsRunning(false)
       }
     },
-    // onComplete is deferred to the dialog closing (rather than called
-    // right after onHandle) so the result message stays on screen until the
-    // photographer has actually seen it.
     dialog: resultMessage
       ? {
           type: 'dialog',

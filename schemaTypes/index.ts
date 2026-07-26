@@ -13,10 +13,6 @@ import {serviceType} from './serviceType'
 import {testimonialType} from './testimonialType'
 import {workType} from './workType'
 
-// Array is in alphabetical order by document title (Client, Experience,
-// Feed, Music Release, Page, Page Metadata, Photo, Post, Press Mention,
-// Product, Recommendation, Service, Testimonial, Work). The Studio's default
-// document list follows this array's order.
 export const schemaTypes = [
   clientType,
   experienceType,

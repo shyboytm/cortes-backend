@@ -1,37 +1,3 @@
-// One-time bulk import for the "musicRelease" documents that power the
-// releases grid on the Music page. Safe to delete after you've run it once.
-//
-// music-releases-data.json is populated with all 41 releases from
-// cordio.bandcamp.com (title, type, year, Bandcamp link, and an artwork URL
-// to download+upload), sorted newest-first with a matching "order" value.
-// Each object is shaped like:
-//
-//   {
-//     "title": "HM-09",
-//     "artist": "Cordio",                 // or "HORIZON ✶ RADAR"
-//     "releaseType": "album",              // album | ep | remix | single
-//     "genre": "Ambient",                  // optional — not set on the import
-//     "releaseYear": "2024",               // four digits, as a string
-//     "link": "https://cordio.bandcamp.com/album/hm-09",
-//     "artworkUrl": "https://f4.bcbits.com/img/xxxxx_10.jpg",  // optional
-//     "order": 1                           // optional — lower shows first
-//   }
-//
-// Setup (run these yourself — never share the token with anyone, including Claude):
-//   1. Go to https://www.sanity.io/manage, pick this project (m83idean),
-//      then API -> Tokens -> Add API token. Give it "Editor" permissions.
-//   2. Copy the token and export it in your terminal (don't put it in a file
-//      that gets committed):
-//        export SANITY_WRITE_TOKEN="sk..."
-//   3. Install dependencies if you haven't already:
-//        pnpm install
-//   4. Run the import:
-//        pnpm run import:music
-//
-// The script is idempotent-ish: it checks for an existing release with the
-// same title+artist before creating a new one, so it's safe to re-run if it
-// fails partway through. If "artworkUrl" is set, the image is downloaded and
-// uploaded to Sanity as the release's artwork asset.
 
 import {createClient} from '@sanity/client'
 import {readFile} from 'node:fs/promises'

@@ -1,10 +1,5 @@
 import {defineField, defineType} from 'sanity'
 
-// Shared by the image, uploaded-video, and video-embed case-study blocks
-// below so their "Layout" field stays in lockstep — same options, same
-// default, same radio layout — without maintaining three copies of the
-// list. Mirrors the identical constant in postType.ts (the blog post
-// schema uses this same body-array pattern).
 const mediaLayoutOptions = {
   list: [
     {title: 'Inset (default)', value: 'inset'},
