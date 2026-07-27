@@ -20,6 +20,7 @@
   ],
   "dependencies": {
     "@sanity/client": "^6.24.1",
+    "@sanity/code-input": "^7.3.3",
     "@sanity/vision": "^5.31.1",
     "react": "^19.1",
     "react-dom": "^19.1",

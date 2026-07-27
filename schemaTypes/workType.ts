@@ -274,6 +274,13 @@ export const workType = defineType({
           },
         },
         {
+          type: 'code',
+          title: 'Code Block',
+          options: {
+            withFilename: true,
+          },
+        },
+        {
           type: 'object',
           name: 'endOffset',
           title: 'End Offset Media',
