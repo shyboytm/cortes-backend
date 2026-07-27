@@ -1,4 +1,5 @@
 import {clientType} from './clientType'
+import {commentType} from './commentType'
 import {experienceType} from './experienceType'
 import {feedItemType} from './feedItemType'
 import {musicReleaseType} from './musicReleaseType'
@@ -15,6 +16,7 @@ import {workType} from './workType'
 
 export const schemaTypes = [
   clientType,
+  commentType,
   experienceType,
   feedItemType,
   musicReleaseType,
