@@ -282,6 +282,72 @@ export const workType = defineType({
         },
         {
           type: 'object',
+          name: 'imageCarousel',
+          title: 'Image Carousel',
+          description:
+            'A full-width, swipeable image carousel with next/previous controls. Add 2 or more images, '
+            + 'each with an optional caption shown under it while it\'s active.',
+          fields: [
+            defineField({
+              name: 'images',
+              title: 'Images',
+              type: 'array',
+              of: [
+                {
+                  type: 'image',
+                  options: {hotspot: true},
+                  fields: [
+                    defineField({
+                      name: 'alt',
+                      title: 'Alt text',
+                      type: 'string',
+                      description: 'Describe the image for accessibility and SEO.',
+                    }),
+                    defineField({
+                      name: 'caption',
+                      title: 'Caption',
+                      type: 'string',
+                      description: 'Optional caption shown under this image while it\'s active in the carousel.',
+                    }),
+                  ],
+                },
+              ],
+              validation: (rule) => rule.min(2).error('Add at least 2 images to make a carousel.'),
+            }),
+          ],
+          preview: {
+            select: {images: 'images'},
+            prepare({images}: {images?: unknown[]}) {
+              const count = images?.length ?? 0
+              return {
+                title: 'Image Carousel',
+                subtitle: `${count} image${count === 1 ? '' : 's'}`,
+              }
+            },
+          },
+        },
+        {
+          type: 'object',
+          name: 'divider',
+          title: 'Divider',
+          description: 'Renders a horizontal rule to visually separate sections.',
+          fields: [
+            defineField({
+              name: 'note',
+              type: 'string',
+              hidden: true,
+              readOnly: true,
+              initialValue: 'Renders a horizontal rule divider.',
+            }),
+          ],
+          preview: {
+            prepare() {
+              return {title: 'Divider', subtitle: '—————————'}
+            },
+          },
+        },
+        {
+          type: 'object',
           name: 'endOffset',
           title: 'End Offset Media',
           description:
