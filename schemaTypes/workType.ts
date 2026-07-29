@@ -92,6 +92,14 @@ export const workType = defineType({
         'Optional. When on, this project shows a "Coming soon" tag instead of a link on the homepage and Work index, and its case study page isn\'t publicly reachable — so you can keep building it out without it being live yet.',
     }),
     defineField({
+      name: 'comingSoonPassword',
+      title: 'Preview Password',
+      type: 'string',
+      hidden: ({parent}) => !parent?.comingSoon,
+      description:
+        'Optional. If set while Coming Soon is on, anyone who knows this password can open the case study\'s direct link, enter it, and view the full page early. Leave empty to keep the case study fully hidden from everyone.',
+    }),
+    defineField({
       name: 'mainImage',
       title: 'Main Image',
       type: 'image',
