@@ -15,14 +15,14 @@ export const recommendationType = defineType({
     defineField({
       name: 'category',
       type: 'string',
-      description: 'Groups recommendations into sections on the Recs page.',
+      description:
+        'Groups recommendations into sections on the Recs page. Resource also covers blogs and articles.',
       options: {
         list: [
-          {title: 'Resource', value: 'resource'},
+          {title: 'Resource / Article', value: 'resource'},
           {title: 'Book', value: 'book'},
           {title: 'Podcast', value: 'podcast'},
           {title: 'Video', value: 'video'},
-          {title: 'Blog & Article', value: 'blog'},
           {title: 'App', value: 'app'},
           {title: 'Music', value: 'music'},
           {title: 'Gear', value: 'gear'},
